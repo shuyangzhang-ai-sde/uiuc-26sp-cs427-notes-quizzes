@@ -12,14 +12,6 @@ Static study site for **CS 427: Software Engineering** (UIUC) — weekly notes w
 
 No build step. Open `index.html` in your browser (double-click or drag into a tab).
 
-If anything fails under `file://`, run a static server from the repo root:
-
-```
-python3 -m http.server 8080
-```
-
-then visit `http://localhost:8080/index.html`.
-
 ## Project layout
 
 | Path | Role |
