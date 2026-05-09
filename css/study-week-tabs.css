@@ -42,6 +42,11 @@
   animation:studyTabFadeIn 0.2s ease;
 }
 
+/* Quiz sub-panels (e.g. Summary vs. Practice): same transition as note tabs */
+.qz-tab-panel.active{
+  animation:studyTabFadeIn 0.2s ease;
+}
+
 @keyframes studyTabFadeIn{
   from{opacity:0;transform:translateY(4px);}
   to{opacity:1;transform:translateY(0);}

@@ -190,20 +190,18 @@ Jane’s off-site backup is <strong>risk protection</strong> (mitigation).</div>
 </div>
 <div class="quiz-pane pane">
 <div class="qz-wrap">
-<div class="qz-header">
-<h2>Week 2 — quiz</h2>
+<div class="qz-toolbar">
+<h2 class="qz-heading">Week 2 — quiz</h2>
+<div class="qz-actions">
+<button class="qz-reset" onclick="week2ResetActiveQuiz()" type="button">Reset</button>
+<div class="score-bar">Score: <span class="score-pill" id="score-display">— / 15</span><span class="score-pill" id="score-week2-practice" hidden>— / —</span></div>
 </div>
-<nav aria-label="Quiz sections" class="qz-tab-nav">
-<button class="qz-tab-btn active" onclick="switchQuizTab('summary',this)" type="button">Summary Quiz</button>
-<button class="qz-tab-btn" onclick="switchQuizTab('practice',this)" type="button">Practice Quiz</button>
+</div>
+<nav aria-label="Quiz sections" class="tab-nav">
+<button class="tab-btn active" onclick="switchQuizTab('summary',this)" type="button">Summary Quiz</button>
+<button class="tab-btn" onclick="switchQuizTab('practice',this)" type="button">Practice Quiz</button>
 </nav>
 <div class="qz-tab-panel active" id="qz-panel-summary">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuiz()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-display">— / 15</span></div>
-</div>
-</div>
 <div id="questions-container"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-practice">
@@ -421,13 +419,38 @@ const questions = [
 <script>
 QuizPane.mount({ questions: questions });
 
+function syncWeek2QuizToolbar(panelId) {
+  var summaryEl = document.getElementById('score-display');
+  var practiceEl = document.getElementById('score-week2-practice');
+  if (panelId === 'qz-panel-practice') {
+    if (summaryEl) summaryEl.hidden = true;
+    if (practiceEl) practiceEl.hidden = false;
+  } else {
+    if (summaryEl) summaryEl.hidden = false;
+    if (practiceEl) practiceEl.hidden = true;
+  }
+}
+
+window.week2ResetActiveQuiz = function () {
+  var active = document.querySelector('.quiz-pane .qz-tab-panel.active');
+  var pid = active && active.id;
+  if (pid === 'qz-panel-practice') {
+    if (typeof window.resetWeek2PracticeQuiz === 'function') window.resetWeek2PracticeQuiz();
+  } else {
+    resetQuiz();
+  }
+};
+
 function switchQuizTab(id, btn) {
   var pane = btn.closest('.quiz-pane');
   if (!pane) return;
   pane.querySelectorAll('.qz-tab-panel').forEach(function(p){ p.classList.remove('active'); });
-  pane.querySelectorAll('.qz-tab-nav .qz-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  pane.querySelectorAll('.tab-nav .tab-btn').forEach(function(b){ b.classList.remove('active'); });
   var panel = document.getElementById('qz-panel-' + id);
-  if (panel) panel.classList.add('active');
+  if (panel) {
+    panel.classList.add('active');
+    syncWeek2QuizToolbar(panel.id);
+  }
   btn.classList.add('active');
 }
 
@@ -471,8 +494,10 @@ function switchQuizTab(id, btn) {
     }
   ];
 
+  function buildWeek2PracticeQuiz() {
   var container = document.getElementById('pq-container');
   if (!container) return;
+  container.innerHTML = '';
   var multiState = {};
   var answeredSingle = {};
 
@@ -578,6 +603,10 @@ function switchQuizTab(id, btn) {
     card.appendChild(expl);
     container.appendChild(card);
   });
+  }
+
+  buildWeek2PracticeQuiz();
+  window.resetWeek2PracticeQuiz = buildWeek2PracticeQuiz;
 })();
 </script>
 <script src="js/study-weeks-config.js"></script>

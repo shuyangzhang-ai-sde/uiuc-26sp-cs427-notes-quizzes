@@ -556,82 +556,38 @@
 </div>
 <div class="quiz-pane pane">
 <div class="qz-wrap">
-<div class="qz-header">
-<h2>Chapter 11 — quiz</h2>
+<div class="qz-toolbar">
+<h2 class="qz-heading">Chapter 11 — quiz</h2>
+<div class="qz-actions">
+<button class="qz-reset" onclick="ch11ResetActiveQuiz()" type="button">Reset</button>
+<div class="score-bar">Score: <span class="score-pill" id="score-ch11-11-1" hidden>— / 3</span><span class="score-pill" id="score-ch11-11-2" hidden>— / 3</span><span class="score-pill" id="score-ch11-11-3" hidden>— / 3</span><span class="score-pill" id="score-ch11-11-4" hidden>— / 3</span><span class="score-pill" id="score-ch11-11-5" hidden>— / 4</span><span class="score-pill" id="score-ch11-11-6" hidden>— / —</span><span class="score-pill" id="score-ch11-11-7" hidden>— / 2</span><span class="score-pill" id="score-ch11-11-8" hidden>— / 3</span><span class="score-pill" id="score-ch11-11-sum">— / 15</span></div>
+</div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-11-1">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuizCh11_11_1()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-ch11-11-1">— / 3</span></div>
-</div>
-</div>
 <div id="questions-ch11-11-1"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-11-2">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuizCh11_11_2()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-ch11-11-2">— / 3</span></div>
-</div>
-</div>
 <div id="questions-ch11-11-2"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-11-3">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuizCh11_11_3()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-ch11-11-3">— / 3</span></div>
-</div>
-</div>
 <div id="questions-ch11-11-3"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-11-4">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuizCh11_11_4()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-ch11-11-4">— / 3</span></div>
-</div>
-</div>
 <div id="questions-ch11-11-4"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-11-5">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuizCh11_11_5()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-ch11-11-5">— / 4</span></div>
-</div>
-</div>
 <div id="questions-ch11-11-5"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-11-6">
 <p style="padding:16px 4px;color:var(--muted);font-size:0.88rem;">No quiz in Coursera.</p>
 </div>
 <div class="qz-tab-panel" id="qz-panel-11-7">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuizCh11_11_7()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-ch11-11-7">— / 2</span></div>
-</div>
-</div>
 <div id="questions-ch11-11-7"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-11-8">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuizCh11_11_8()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-ch11-11-8">— / 3</span></div>
-</div>
-</div>
 <div id="questions-ch11-11-8"></div>
 </div>
 <div class="qz-tab-panel active" id="qz-panel-11-sum">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuizCh11_11_sum()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-ch11-11-sum">— / 15</span></div>
-</div>
-</div>
 <div id="questions-ch11-11-sum"></div>
 </div>
 </div>
@@ -650,6 +606,47 @@ var NOTE_TO_QUIZ = {
   '11-8-design-by-contract': '11-8',
   'summary': '11-sum'
 };
+var CH11_SCORE_PILL_IDS = [
+  'score-ch11-11-1',
+  'score-ch11-11-2',
+  'score-ch11-11-3',
+  'score-ch11-11-4',
+  'score-ch11-11-5',
+  'score-ch11-11-6',
+  'score-ch11-11-7',
+  'score-ch11-11-8',
+  'score-ch11-11-sum'
+];
+var CH11_PANEL_TO_SCORE_ID = {
+  'qz-panel-11-1': 'score-ch11-11-1',
+  'qz-panel-11-2': 'score-ch11-11-2',
+  'qz-panel-11-3': 'score-ch11-11-3',
+  'qz-panel-11-4': 'score-ch11-11-4',
+  'qz-panel-11-5': 'score-ch11-11-5',
+  'qz-panel-11-6': 'score-ch11-11-6',
+  'qz-panel-11-7': 'score-ch11-11-7',
+  'qz-panel-11-8': 'score-ch11-11-8',
+  'qz-panel-11-sum': 'score-ch11-11-sum'
+};
+function syncCh11QuizToolbar(panelId) {
+  var showId = CH11_PANEL_TO_SCORE_ID[panelId] || 'score-ch11-11-sum';
+  CH11_SCORE_PILL_IDS.forEach(function (sid) {
+    var el = document.getElementById(sid);
+    if (el) el.hidden = sid !== showId;
+  });
+}
+window.ch11ResetActiveQuiz = function () {
+  var active = document.querySelector('.quiz-pane .qz-tab-panel.active');
+  var pid = active && active.id;
+  if (pid === 'qz-panel-11-1') resetQuizCh11_11_1();
+  else if (pid === 'qz-panel-11-2') resetQuizCh11_11_2();
+  else if (pid === 'qz-panel-11-3') resetQuizCh11_11_3();
+  else if (pid === 'qz-panel-11-4') resetQuizCh11_11_4();
+  else if (pid === 'qz-panel-11-5') resetQuizCh11_11_5();
+  else if (pid === 'qz-panel-11-7') resetQuizCh11_11_7();
+  else if (pid === 'qz-panel-11-8') resetQuizCh11_11_8();
+  else if (pid === 'qz-panel-11-sum') resetQuizCh11_11_sum();
+};
 function switchTab(id, btn) {
   if (!btn) return;
   var pane = btn.closest('.notes-pane');
@@ -663,7 +660,10 @@ function switchTab(id, btn) {
   document.querySelectorAll('.qz-tab-panel').forEach(function(p) { p.classList.remove('active'); });
   var qzPanel = qzId ? document.getElementById('qz-panel-' + qzId) : null;
   if (!qzPanel) qzPanel = document.getElementById('qz-panel-11-sum');
-  if (qzPanel) qzPanel.classList.add('active');
+  if (qzPanel) {
+    qzPanel.classList.add('active');
+    syncCh11QuizToolbar(qzPanel.id);
+  }
 }
 
 var CH11_RAW_QUESTIONS = [
@@ -788,6 +788,7 @@ ch11Mount({
   idPrefix: 'ch11m11-sum-',
   resetGlobalName: 'resetQuizCh11_11_sum'
 });
+syncCh11QuizToolbar('qz-panel-11-sum');
 </script>
 <script src="js/study-weeks-config.js"></script>
 <script src="js/study-lang.js"></script>

@@ -830,79 +830,44 @@ void test() {
 </div>
 <div class="quiz-pane pane">
 <div class="qz-wrap">
-<div class="qz-header">
-<h2>Week 8 — quiz</h2>
+<div class="qz-toolbar">
+<h2 class="qz-heading">Week 8 — quiz</h2>
+<div class="qz-actions">
+<button class="qz-reset" onclick="week8ResetActiveQuiz()" type="button">Reset</button>
+<div class="score-bar">Score:
+<span class="score-pill" id="score-display">— / 16</span>
+<span class="score-pill" id="score-display-82" hidden>— / 5</span>
+<span class="score-pill" id="score-display-83" hidden>— / 5</span>
+<span class="score-pill" id="score-display-84" hidden>— / 4</span>
+<span class="score-pill" id="score-display-85" hidden>— / 5</span>
+<span class="score-pill" id="score-display-86" hidden>— / 5</span>
+<span class="score-pill" id="score-display-87" hidden>— / 4</span>
+<span class="score-pill" id="score-display-88" hidden>— / 5</span>
+</div>
+</div>
 </div>
 <div class="qz-tab-panel active" id="qz-panel-summary">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuiz()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-display">— / 16</span></div>
-</div>
-</div>
 <div id="questions-container"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-q82">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuiz82()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-display-82">— / 5</span></div>
-</div>
-</div>
 <div id="questions-container-82"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-q83">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuiz83()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-display-83">— / 5</span></div>
-</div>
-</div>
 <div id="questions-container-83"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-q84">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuiz84()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-display-84">— / 4</span></div>
-</div>
-</div>
 <div id="questions-container-84"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-q85">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuiz85()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-display-85">— / 5</span></div>
-</div>
-</div>
 <div id="questions-container-85"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-q86">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuiz86()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-display-86">— / 5</span></div>
-</div>
-</div>
 <div id="questions-container-86"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-q87">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuiz87()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-display-87">— / 4</span></div>
-</div>
-</div>
 <div id="questions-container-87"></div>
 </div>
 <div class="qz-tab-panel" id="qz-panel-q88">
-<div class="qz-panel-toolbar">
-<div class="qz-actions">
-<button class="qz-reset" onclick="resetQuiz88()" type="button">Reset</button>
-<div class="score-bar">Score: <span class="score-pill" id="score-display-88">— / 5</span></div>
-</div>
-</div>
 <div id="questions-container-88"></div>
 </div>
 </div>
@@ -949,6 +914,45 @@ var NOTE_TO_QUIZ = {
   '8-7': 'q87',
   '8-8': 'q88'
 };
+var WEEK8_SCORE_PILL_IDS = [
+  'score-display',
+  'score-display-82',
+  'score-display-83',
+  'score-display-84',
+  'score-display-85',
+  'score-display-86',
+  'score-display-87',
+  'score-display-88'
+];
+var WEEK8_PANEL_TO_SCORE_ID = {
+  'qz-panel-summary': 'score-display',
+  'qz-panel-q82': 'score-display-82',
+  'qz-panel-q83': 'score-display-83',
+  'qz-panel-q84': 'score-display-84',
+  'qz-panel-q85': 'score-display-85',
+  'qz-panel-q86': 'score-display-86',
+  'qz-panel-q87': 'score-display-87',
+  'qz-panel-q88': 'score-display-88'
+};
+function syncWeek8QuizToolbar(panelId) {
+  var showId = WEEK8_PANEL_TO_SCORE_ID[panelId] || 'score-display';
+  WEEK8_SCORE_PILL_IDS.forEach(function (sid) {
+    var el = document.getElementById(sid);
+    if (el) el.hidden = sid !== showId;
+  });
+}
+window.week8ResetActiveQuiz = function () {
+  var active = document.querySelector('.quiz-pane .qz-tab-panel.active');
+  var pid = active && active.id;
+  if (pid === 'qz-panel-summary') resetQuiz();
+  else if (pid === 'qz-panel-q82') resetQuiz82();
+  else if (pid === 'qz-panel-q83') resetQuiz83();
+  else if (pid === 'qz-panel-q84') resetQuiz84();
+  else if (pid === 'qz-panel-q85') resetQuiz85();
+  else if (pid === 'qz-panel-q86') resetQuiz86();
+  else if (pid === 'qz-panel-q87') resetQuiz87();
+  else if (pid === 'qz-panel-q88') resetQuiz88();
+};
 window.switchTab = function (id, btn) {
   if (!btn) return;
   var notesPane = btn.closest('.notes-pane');
@@ -962,7 +966,10 @@ window.switchTab = function (id, btn) {
   document.querySelectorAll('.quiz-pane .qz-tab-panel').forEach(function (p) { p.classList.remove('active'); });
   var qzPanel = qzId ? document.getElementById('qz-panel-' + qzId) : null;
   if (!qzPanel) qzPanel = document.getElementById('qz-panel-summary');
-  if (qzPanel) qzPanel.classList.add('active');
+  if (qzPanel) {
+    qzPanel.classList.add('active');
+    syncWeek8QuizToolbar(qzPanel.id);
+  }
 };
 
 QuizPane.mount({ questions: questions });

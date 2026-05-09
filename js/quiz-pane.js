@@ -54,6 +54,13 @@
     if (q.code) {
       parts.push('<pre class="q-code"><code>' + esc(q.code) + '</code></pre>');
     }
+    if (q.afterCode) {
+      parts.push(
+        '<div class="q-after-code">' +
+          esc(q.afterCode).replace(/\n/g, '<br>') +
+          '</div>'
+      );
+    }
     return parts.join('');
   }
 
@@ -76,6 +83,11 @@
     return '';
   }
 
+  function optionIsCorrect(q, oi) {
+    if (Array.isArray(q.correct)) return q.correct.indexOf(oi) >= 0;
+    return oi === q.correct;
+  }
+
   function preprocessQuestions(questions, expandExplanationToOptions) {
     if (!expandExplanationToOptions) return questions;
     return questions.map(function (q) {
@@ -85,7 +97,7 @@
       if (hasList || q.exp == null) return q;
       return Object.assign({}, q, {
         explanations: q.options.map(function (opt, oi) {
-          return oi === q.correct
+          return optionIsCorrect(q, oi)
             ? '✅ ' + q.exp
             : '❌ ' + opt + ' — Incorrect.';
         }),
@@ -153,8 +165,9 @@
 
     function selectOption(qIdx, optIdx) {
       if (answered[qIdx]) return;
-      answered[qIdx] = true;
       var q = questions[qIdx];
+      if (Array.isArray(q.correct)) return;
+      answered[qIdx] = true;
       var isCorrect = optIdx === q.correct;
       if (isCorrect) correctCount++;
       q.options.forEach(function (_, oi) {
@@ -176,6 +189,95 @@
       updateScore();
     }
 
+    function setsEqualIndices(a, b) {
+      if (a.length !== b.length) return false;
+      var sa = a.slice().sort(function (x, y) {
+        return x - y;
+      });
+      var sb = b.slice().sort(function (x, y) {
+        return x - y;
+      });
+      for (var i = 0; i < sa.length; i++) if (sa[i] !== sb[i]) return false;
+      return true;
+    }
+
+    function toggleMultiPick(qIdx, oi) {
+      if (answered[qIdx]) return;
+      var btn = document.getElementById(optElId(qIdx, oi));
+      if (!btn || btn.disabled) return;
+      btn.classList.toggle('qz-opt-picked');
+    }
+
+    function confirmMulti(qIdx) {
+      if (answered[qIdx]) return;
+      var q = questions[qIdx];
+      var corr = q.correct;
+      if (!Array.isArray(corr)) return;
+
+      var picked = [];
+      q.options.forEach(function (_, oi) {
+        var btn = document.getElementById(optElId(qIdx, oi));
+        if (btn && btn.classList.contains('qz-opt-picked')) picked.push(oi);
+      });
+
+      answered[qIdx] = true;
+      var ok = setsEqualIndices(picked, corr);
+      if (ok) correctCount++;
+
+      q.options.forEach(function (_, oi) {
+        var btn = document.getElementById(optElId(qIdx, oi));
+        if (!btn) return;
+        btn.disabled = true;
+        btn.classList.remove('qz-opt-picked');
+        var inCorr = corr.indexOf(oi) >= 0;
+        var userPick = picked.indexOf(oi) >= 0;
+        if (ok && inCorr) btn.className = 'qz-opt-correct';
+        else if (!ok && userPick && !inCorr) btn.className = 'qz-opt-wrong';
+        else if (!ok && !userPick && inCorr) btn.className = 'qz-opt-reveal';
+        else if (!ok && userPick && inCorr) btn.className = 'qz-opt-correct';
+        else btn.className = 'qz-opt-neutral';
+      });
+
+      var explEl = document.getElementById(explElId(qIdx));
+      if (explEl) {
+        explEl.style.display = 'block';
+        explEl.classList.toggle('qz-explanation-correct', ok);
+        explEl.classList.toggle('qz-explanation-wrong', !ok);
+      }
+      var checkBtn = document.getElementById(idPrefix + 'multi-check-' + qIdx);
+      if (checkBtn) checkBtn.disabled = true;
+      updateScore();
+    }
+
+    function revealAnswerKey(qIdx) {
+      if (answered[qIdx]) return;
+      var q = questions[qIdx];
+      if (Array.isArray(q.correct)) {
+        answered[qIdx] = true;
+        correctCount++;
+        var corr = q.correct;
+        q.options.forEach(function (_, oi) {
+          var btn = document.getElementById(optElId(qIdx, oi));
+          if (!btn) return;
+          btn.disabled = true;
+          btn.classList.remove('qz-opt-picked');
+          if (corr.indexOf(oi) >= 0) btn.className = 'qz-opt-correct';
+          else btn.className = 'qz-opt-neutral';
+        });
+        var explEl = document.getElementById(explElId(qIdx));
+        if (explEl) {
+          explEl.style.display = 'block';
+          explEl.classList.add('qz-explanation-correct');
+          explEl.classList.remove('qz-explanation-wrong');
+        }
+        var checkBtn = document.getElementById(idPrefix + 'multi-check-' + qIdx);
+        if (checkBtn) checkBtn.disabled = true;
+        updateScore();
+      } else {
+        selectOption(qIdx, q.correct);
+      }
+    }
+
     function buildQuestions() {
       var container = document.getElementById(containerId);
       if (!container) return;
@@ -186,10 +288,13 @@
       questions.forEach(function (q, idx) {
         var card = document.createElement('div');
         card.className = 'q-card';
+        var isMulti = Array.isArray(q.correct);
         var optsHTML = q.options
           .map(function (opt, oi) {
             return (
-              '<button type="button" class="qz-opt" id="' +
+              '<button type="button" class="qz-opt' +
+              (isMulti ? ' qz-opt-multi' : '') +
+              '" id="' +
               optElId(idx, oi) +
               '" data-q="' +
               idx +
@@ -201,6 +306,16 @@
             );
           })
           .join('');
+        if (isMulti) {
+          optsHTML +=
+            '<div class="qz-multi-footer"><button type="button" class="qz-multi-check" id="' +
+            idPrefix +
+            'multi-check-' +
+            idx +
+            '" data-q="' +
+            idx +
+            '">Check answer</button></div>';
+        }
         var explInner = renderExplanation(q, idx, escapeHtml);
         var explBlock = explInner
           ? '<div class="qz-explanation" id="' +
@@ -233,12 +348,20 @@
     var containerEl = document.getElementById(containerId);
     if (containerEl) {
       containerEl.addEventListener('click', function (e) {
+        var checkBtn = e.target.closest('.qz-multi-check');
+        if (checkBtn && !checkBtn.disabled) {
+          var cq = parseInt(checkBtn.getAttribute('data-q'), 10);
+          confirmMulti(cq);
+          return;
+        }
         var btn = e.target.closest('.qz-opt');
         if (!btn || btn.disabled) return;
         var qIdx = parseInt(btn.getAttribute('data-q'), 10);
         var oi = parseInt(btn.getAttribute('data-o'), 10);
         if (btn.id !== optElId(qIdx, oi)) return;
-        selectOption(qIdx, oi);
+        var qq = questions[qIdx];
+        if (Array.isArray(qq.correct)) toggleMultiPick(qIdx, oi);
+        else selectOption(qIdx, oi);
       });
     }
 
@@ -253,6 +376,8 @@
       buildQuestions: buildQuestions,
       resetQuiz: resetQuiz,
       selectOption: selectOption,
+      revealAnswerKey: revealAnswerKey,
+      confirmMulti: confirmMulti,
     };
   }
 

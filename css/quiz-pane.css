@@ -46,6 +46,14 @@
   margin-bottom: 18px;
 }
 
+/* Notes-synced quiz sections: show one panel at a time */
+.qz-tab-panel {
+  display: none;
+}
+.qz-tab-panel.active {
+  display: block;
+}
+
 .qz-heading {
   font-family: 'Lora', serif;
   font-size: 1.35rem;
@@ -72,6 +80,18 @@
   display: none;
 }
 
+/* Optional: use .tab-nav + .tab-btn from study-week-tabs.css for the same look as note tabs. */
+.qz-tab-nav {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 2px;
+  row-gap: 6px;
+  border: none;
+  margin-bottom: 24px;
+  padding-bottom: 0;
+  overflow: visible;
+}
+
 .qz-tab-btn {
   font-family: 'Source Sans 3', sans-serif;
   font-size: 0.83rem;
@@ -80,15 +100,22 @@
   border: none;
   background: none;
   color: var(--muted);
-  cursor: default;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
+  cursor: pointer;
   white-space: nowrap;
+  text-decoration: none;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 0.12em;
+  transition: color 0.15s, text-decoration-color 0.15s;
 }
 
 .qz-tab-btn.active {
   color: var(--text);
-  border-bottom-color: var(--text);
+  text-decoration: underline;
+  text-decoration-color: currentColor;
+}
+
+.qz-tab-btn:hover:not(.active) {
+  color: var(--text2);
 }
 
 .qz-actions {
@@ -343,4 +370,41 @@
   font-size: 0.86rem;
   color: var(--text2);
   line-height: 1.55;
+}
+
+.q-after-code {
+  margin: 0 0 14px 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--text2);
+}
+
+.qz-opt-picked:not([disabled]) {
+  box-shadow: inset 0 0 0 2px var(--blue, #2d5fa6);
+  background: var(--blue-light, #ebf1fb);
+}
+
+.qz-multi-footer {
+  margin-top: 10px;
+}
+
+.qz-multi-check {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: 4px;
+  border: none;
+  background: var(--blue);
+  color: #fff;
+  cursor: pointer;
+}
+
+.qz-multi-check:hover:not([disabled]) {
+  opacity: 0.92;
+}
+
+.qz-multi-check[disabled] {
+  opacity: 0.45;
+  cursor: default;
 }

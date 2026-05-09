@@ -17,7 +17,7 @@ window.STUDY_WEEKS = [
   { id: 'week-12', num: 12, file: null, label: 'Iteration 4', soon: true },
   { id: 'week-13', num: 13, file: 'week_13_exam_1.html', label: 'Exam 1' },
   { id: 'week-14', num: 14, file: 'week_14_software_maintenance.html', label: 'Software Maintenance' },
-  { id: 'week-15', num: 15, file: null, label: 'Exam 2', soon: true },
+  { id: 'week-15', num: 15, file: 'week_15_exam_2.html', label: 'Exam 2' },
   { id: 'week-16', num: 16, file: null, label: 'Final Deliverable', soon: true }
 ];
 
